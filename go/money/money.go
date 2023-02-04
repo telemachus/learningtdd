@@ -1,22 +1,39 @@
 // Package money implements arithmetic and conversion for several currencies.
 package money
 
-// A Dollar stores information about money in US dollars.
-type Dollar struct {
-	amount int
+// A Money stores information about money in any currency.
+type Money struct {
+	amount   float64
+	currency string
 }
 
-// NewDollar returns a pointer to Dollar initialized to n dollars.
-func NewDollar(n int) *Dollar {
-	return &Dollar{amount: n}
+// NewMoney returns a pointer to Money initialized to n dollars and c currency.
+func NewMoney(n float64, c string) *Money {
+	return &Money{
+		amount:   n,
+		currency: c,
+	}
 }
 
-// Times returns a new pointer to Dollar initialized to d.amount times multiplier.
-func (d *Dollar) Times(multiplier int) *Dollar {
-	return &Dollar{amount: d.amount * multiplier}
+// Times returns a new pointer to Money initialized to d.amount times
+// multiplier. The pointer's currency will be the same as that of m.
+func (m *Money) Times(multiplier float64) *Money {
+	return &Money{
+		amount:   m.amount * multiplier,
+		currency: m.currency,
+	}
 }
 
-// Amount returns the current number of dollars stored in a Dollar.
-func (d *Dollar) Amount() int {
-	return d.amount
+// Divide returns a new pointer to Money initialized to m.amount divided by
+// divisor. The pointer's currency will be the same as that of m.
+func (m *Money) Divide(divisor float64) *Money {
+	return &Money{
+		amount:   m.amount / divisor,
+		currency: m.currency,
+	}
+}
+
+// Amount returns the current amount of currency stored in a Money.
+func (m *Money) Amount() float64 {
+	return m.amount
 }
