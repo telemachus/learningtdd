@@ -40,3 +40,24 @@ func TestDivisionOfWon(t *testing.T) {
 
 	amountCheck(t, "m.Divide(4)", got.Amount(), want.Amount())
 }
+
+func TestAddition(t *testing.T) {
+	t.Parallel()
+	var portfolio money.Portfolio
+	var portfolioInDollars *money.Money
+
+	fiveDollars := money.NewMoney(5, "USD")
+	tenDollars := money.NewMoney(10, "USD")
+	fifteenDollars := money.NewMoney(15, "USD")
+
+	portfolio = portfolio.Add(fiveDollars)
+	portfolio = portfolio.Add(tenDollars)
+	portfolioInDollars = portfolio.Evaluate("USD")
+
+	amountCheck(
+		t,
+		"portfolio.Add(fiveDollars) + portfolio.Add(tenDollars)",
+		portfolioInDollars.Amount(),
+		fifteenDollars.Amount(),
+	)
+}
