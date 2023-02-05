@@ -34,6 +34,7 @@ func TestDivision(t *testing.T) {
 
 func TestAddition(t *testing.T) {
 	t.Parallel()
+
 	var portfolio investment.Portfolio
 	var portfolioInDollars *investment.Money
 
@@ -50,5 +51,27 @@ func TestAddition(t *testing.T) {
 		"portfolio.Add(fiveDollars) + portfolio.Add(tenDollars)",
 		portfolioInDollars.Amount(),
 		fifteenDollars.Amount(),
+	)
+}
+
+func TestAdditionOfDollarsAndEuros(t *testing.T) {
+	t.Parallel()
+
+	var portfolio investment.Portfolio
+
+	fiveDollars := investment.NewMoney(5, "USD")
+	tenEuros := investment.NewMoney(10, "EUR")
+
+	portfolio = portfolio.Add(fiveDollars)
+	portfolio = portfolio.Add(tenEuros)
+
+	got := portfolio.Evaluate("USD")
+	want := investment.NewMoney(17, "USD")
+
+	amountCheck(
+		t,
+		"portfolio.Add(fiveDollars) + portfolio.Add(tenEuros)",
+		got.Amount(),
+		want.Amount(),
 	)
 }
