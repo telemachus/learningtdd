@@ -9,7 +9,7 @@ func amountCheck(t *testing.T, s string, got, want float64) {
 	t.Helper()
 
 	if got != want {
-		t.Errorf("%s = [%+v], want [%+v]\n", s, got, want)
+		t.Errorf("%s = [%+v]; want [%+v]\n", s, got, want)
 	}
 }
 
