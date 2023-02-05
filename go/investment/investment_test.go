@@ -13,16 +13,7 @@ func amountCheck(t *testing.T, s string, got, want float64) {
 	}
 }
 
-func TestMultiplicationOfDollars(t *testing.T) {
-	t.Parallel()
-
-	fiver := investment.NewMoney(5, "USD")
-	tenner := fiver.Times(2)
-
-	amountCheck(t, "fiver.Times(2)", tenner.Amount(), 10)
-}
-
-func TestMultiplicationOfEuros(t *testing.T) {
+func TestMultiplication(t *testing.T) {
 	t.Parallel()
 
 	tenEuros := investment.NewMoney(10, "EUR")
@@ -31,7 +22,7 @@ func TestMultiplicationOfEuros(t *testing.T) {
 	amountCheck(t, "tenEuros.Times(2)", twentyEuros.Amount(), 20)
 }
 
-func TestDivisionOfWon(t *testing.T) {
+func TestDivision(t *testing.T) {
 	t.Parallel()
 
 	m := investment.NewMoney(4002, "KRW")
