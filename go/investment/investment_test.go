@@ -75,3 +75,25 @@ func TestAdditionOfDollarsAndEuros(t *testing.T) {
 		want.Amount(),
 	)
 }
+
+func TestAdditionOfDollarsAndWon(t *testing.T) {
+	t.Parallel()
+
+	var portfolio investment.Portfolio
+
+	oneDollar := investment.NewMoney(1, "USD")
+	elevenHundredWon := investment.NewMoney(1100, "KRW")
+
+	portfolio = portfolio.Add(oneDollar)
+	portfolio = portfolio.Add(elevenHundredWon)
+
+	got := portfolio.Evaluate("KRW")
+	want := investment.NewMoney(2200, "KRW")
+
+	amountCheck(
+		t,
+		"portfolio.Add(fiveDollars) + portfolio.Add(tenEuros)",
+		got.Amount(),
+		want.Amount(),
+	)
+}

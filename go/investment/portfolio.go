@@ -23,6 +23,11 @@ func convert(m *Money, currency string) float64 {
 		return m.amount
 	}
 
-	eurToUsd := 1.2
-	return m.amount * eurToUsd
+	exchangeRates := map[string]float64{
+		"EUR->USD": 1.2,
+		"USD->KRW": 1100,
+	}
+	key := m.currency + "->" + currency
+
+	return exchangeRates[key] * m.amount
 }
