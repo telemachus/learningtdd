@@ -1,5 +1,10 @@
 package investment
 
+import (
+	"errors"
+	"strings"
+)
+
 // A Portfolio keeps track of zero or more Money pointers.
 type Portfolio []*Money
 
@@ -9,18 +14,33 @@ func (p Portfolio) Add(m *Money) Portfolio {
 }
 
 // Evaluate returns  the total value of a Portfolio in a specified currency.
-func (p Portfolio) Evaluate(currency string) *Money {
+func (p Portfolio) Evaluate(currency string) (*Money, error) {
 	total := 0.0
+	failedConversions := make([]string, 0)
+
 	for _, m := range p {
-		total += convert(m, currency)
+		if convertedAmount, ok := convert(m, currency); ok {
+			total += convertedAmount
+		} else {
+			failure := m.currency + "->" + currency
+			failedConversions = append(failedConversions, failure)
+		}
 	}
 
-	return &Money{amount: total, currency: currency}
+	if len(failedConversions) == 0 {
+		return &Money{amount: total, currency: currency}, nil
+	}
+
+	failures := strings.Join(failedConversions, ", ")
+	failures = "[" + failures + "]"
+	err := errors.New("Missing exchange rate(s): " + failures)
+
+	return &Money{}, err
 }
 
-func convert(m *Money, currency string) float64 {
+func convert(m *Money, currency string) (float64, bool) {
 	if m.currency == currency {
-		return m.amount
+		return m.amount, true
 	}
 
 	exchangeRates := map[string]float64{
@@ -28,6 +48,7 @@ func convert(m *Money, currency string) float64 {
 		"USD->KRW": 1100,
 	}
 	key := m.currency + "->" + currency
+	rate, ok := exchangeRates[key]
 
-	return exchangeRates[key] * m.amount
+	return rate * m.amount, ok
 }

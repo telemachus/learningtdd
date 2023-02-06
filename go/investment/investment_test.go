@@ -44,7 +44,11 @@ func TestAddition(t *testing.T) {
 
 	portfolio = portfolio.Add(fiveDollars)
 	portfolio = portfolio.Add(tenDollars)
-	portfolioInDollars = portfolio.Evaluate("USD")
+	portfolioInDollars, err := portfolio.Evaluate("USD")
+
+	if err != nil {
+		t.Fatalf("portfolio.Add(fiveDollars) + portfolio.Add(tenDollars) has error [%+v]; want nil", err)
+	}
 
 	amountCheck(
 		t,
@@ -65,8 +69,12 @@ func TestAdditionOfDollarsAndEuros(t *testing.T) {
 	portfolio = portfolio.Add(fiveDollars)
 	portfolio = portfolio.Add(tenEuros)
 
-	got := portfolio.Evaluate("USD")
+	got, err := portfolio.Evaluate("USD")
 	want := investment.NewMoney(17, "USD")
+
+	if err != nil {
+		t.Fatalf("portfolio.Add(fiveDollars) + portfolio.Add(tenEuros) has error: [%+v]; want nil", err)
+	}
 
 	amountCheck(
 		t,
@@ -87,8 +95,12 @@ func TestAdditionOfDollarsAndWon(t *testing.T) {
 	portfolio = portfolio.Add(oneDollar)
 	portfolio = portfolio.Add(elevenHundredWon)
 
-	got := portfolio.Evaluate("KRW")
+	got, err := portfolio.Evaluate("KRW")
 	want := investment.NewMoney(2200, "KRW")
+
+	if err != nil {
+		t.Fatalf("portfolio.Add(oneDollar) + portfolio.Add(elevenHundredWon) has error [%+v]; want nil", err)
+	}
 
 	amountCheck(
 		t,
@@ -96,4 +108,23 @@ func TestAdditionOfDollarsAndWon(t *testing.T) {
 		got.Amount(),
 		want.Amount(),
 	)
+}
+
+func TestEvaluationWithMissingExchangeRates(t *testing.T) {
+	t.Parallel()
+
+	var portfolio investment.Portfolio
+
+	oneDollar := investment.NewMoney(1, "USD")
+	oneEuro := investment.NewMoney(1, "EUR")
+	oneWon := investment.NewMoney(1, "KRW")
+
+	portfolio = portfolio.Add(oneDollar)
+	portfolio = portfolio.Add(oneEuro)
+	portfolio = portfolio.Add(oneWon)
+
+	_, got := portfolio.Evaluate("Kalganid")
+	if got == nil {
+		t.Error("portfolio.Evaluate(\"Kalganid\") error should not be nil")
+	}
 }
