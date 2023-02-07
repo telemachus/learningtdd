@@ -44,8 +44,8 @@ func TestAddition(t *testing.T) {
 
 	portfolio = portfolio.Add(fiveDollars)
 	portfolio = portfolio.Add(tenDollars)
-	portfolioInDollars, err := portfolio.Evaluate("USD")
 
+	portfolioInDollars, err := portfolio.Evaluate("USD")
 	if err != nil {
 		t.Fatalf("portfolio.Add(fiveDollars) + portfolio.Add(tenDollars) has error [%+v]; want nil", err)
 	}
