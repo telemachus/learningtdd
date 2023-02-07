@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+func getBank() *investment.Bank {
+	b := investment.NewBank()
+	b.AddExchangeRate("EUR", "USD", 1.2)
+	b.AddExchangeRate("USD", "KRW", 1100)
+
+	return b
+}
+
 func amountCheck(t *testing.T, s string, got, want float64) {
 	t.Helper()
 
@@ -45,7 +53,7 @@ func TestAddition(t *testing.T) {
 	portfolio = portfolio.Add(fiveDollars)
 	portfolio = portfolio.Add(tenDollars)
 
-	portfolioInDollars, err := portfolio.Evaluate("USD")
+	portfolioInDollars, err := portfolio.Evaluate(getBank(), "USD")
 	if err != nil {
 		t.Fatalf("portfolio.Add(fiveDollars) + portfolio.Add(tenDollars) has error [%+v]; want nil", err)
 	}
@@ -69,7 +77,7 @@ func TestAdditionOfDollarsAndEuros(t *testing.T) {
 	portfolio = portfolio.Add(fiveDollars)
 	portfolio = portfolio.Add(tenEuros)
 
-	got, err := portfolio.Evaluate("USD")
+	got, err := portfolio.Evaluate(getBank(), "USD")
 	want := investment.NewMoney(17, "USD")
 
 	if err != nil {
@@ -95,7 +103,7 @@ func TestAdditionOfDollarsAndWon(t *testing.T) {
 	portfolio = portfolio.Add(oneDollar)
 	portfolio = portfolio.Add(elevenHundredWon)
 
-	got, err := portfolio.Evaluate("KRW")
+	got, err := portfolio.Evaluate(getBank(), "KRW")
 	want := investment.NewMoney(2200, "KRW")
 
 	if err != nil {
@@ -123,8 +131,32 @@ func TestEvaluationWithMissingExchangeRates(t *testing.T) {
 	portfolio = portfolio.Add(oneEuro)
 	portfolio = portfolio.Add(oneWon)
 
-	_, got := portfolio.Evaluate("Kalganid")
+	_, got := portfolio.Evaluate(getBank(), "Kalganid")
 	if got == nil {
 		t.Error("portfolio.Evaluate(\"Kalganid\") error should not be nil")
 	}
+}
+
+func TestSuccessfulConversion(t *testing.T) {
+	t.Parallel()
+
+	bank := investment.NewBank()
+	bank.AddExchangeRate("EUR", "USD", 1.2)
+	tenEuros := investment.NewMoney(10, "EUR")
+	got, err := bank.Convert(tenEuros, "USD")
+	want := investment.NewMoney(12, "USD")
+
+	if err != nil {
+		t.Fatalf(
+			"bank.Convert(tenEuros, \"USD\") error: [%+v]; want nil",
+			err,
+		)
+	}
+
+	amountCheck(
+		t,
+		"bank.Convert(tenEuros, \"USD\")",
+		got.Amount(),
+		want.Amount(),
+	)
 }
